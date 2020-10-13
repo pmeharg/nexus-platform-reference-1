@@ -21,7 +21,7 @@ services:
        - nexus
 
    nexus:
-     image: 'sonatype/nexus3:3.27.0'
+     image: 'sonatype/nexus3:3.28.0'
      environment:
        BASE_URL: 'http://nexus'
        NEXUS_SECURITY_RANDOMPASSWORD: 'false'
@@ -47,7 +47,7 @@ services:
      volumes:
        - '~/.demo-pv/iq-data:/sonatype-work:delegated'
        - '~/.demo-pv/iq-logs:/opt/sonatype/nexus-iq-server/log:delegated'
-       - './config.yml:/etc/nexus-iq-server/cnfig.yml:delegated'
+       - './config.yml:/etc/nexus-iq-server/config.yml:delegated'
      ports:
        - '8070:8070' 
        - '8071:8071'
@@ -105,39 +105,39 @@ services:
 #        - -hooks=/etc/webhook/iq-consume.json
 #        - -hooks=/etc/webhook/quay-consume.json
 
-  ## Anchore
-   anchore-engine:
-     image: docker.io/anchore/anchore-engine:latest
-     #privileged: true
-     depends_on:
-       - anchore-db
-     ports:
-       - "8228:8228"
-       - "8338:8338"
-     volumes:
-       - ~/.demo-pv/aevolume/config:/config/:z
-     logging:
-       driver: "json-file"
-       options:
-         max-size: 100m
-     environment:
-      # NOTE: this should be set to the same name as this service (e.g. anchore-engine)
-       - ANCHORE_HOST_ID=dockerhostid-anchore-engine
-       - ANCHORE_ENDPOINT_HOSTNAME=anchore-engine
-   anchore-db:
-     image: "postgres:9"
-     volumes:
-       - ~/.demo-pv/aevolume/db:/var/lib/postgresql/data/pgdata/:z
-     environment:
-       - POSTGRES_PASSWORD=mysecretpassword
-       - PGDATA=/var/lib/postgresql/data/pgdata/
-     logging:
-       driver: "json-file"
-       options:
-         max-size: 100m
-     #uncomment to expose a port to allow direct/external access to the DB, for debugging
-     #ports:
-     # - "2345:5432"
+  # ## Anchore
+  #  anchore-engine:
+  #    image: docker.io/anchore/anchore-engine:latest
+  #    #privileged: true
+  #    depends_on:
+  #      - anchore-db
+  #    ports:
+  #      - "8228:8228"
+  #      - "8338:8338"
+  #    volumes:
+  #      - ~/.demo-pv/aevolume/config:/config/:z
+  #    logging:
+  #      driver: "json-file"
+  #      options:
+  #        max-size: 100m
+  #    environment:
+  #     # NOTE: this should be set to the same name as this service (e.g. anchore-engine)
+  #      - ANCHORE_HOST_ID=dockerhostid-anchore-engine
+  #      - ANCHORE_ENDPOINT_HOSTNAME=anchore-engine
+  #  anchore-db:
+  #    image: "postgres:9"
+  #    volumes:
+  #      - ~/.demo-pv/aevolume/db:/var/lib/postgresql/data/pgdata/:z
+  #    environment:
+  #      - POSTGRES_PASSWORD=mysecretpassword
+  #      - PGDATA=/var/lib/postgresql/data/pgdata/
+  #    logging:
+  #      driver: "json-file"
+  #      options:
+  #        max-size: 100m
+  #    #uncomment to expose a port to allow direct/external access to the DB, for debugging
+  #    #ports:
+  #    # - "2345:5432"
 
   ## Go
   #  athens:
@@ -155,26 +155,26 @@ services:
   #    build: ./golang/
   #    image: sonatype-se/golang:compose
 
-## Fortify on-premise integration
-   #The Integration Service connects IQ to Fortify SSC
-   intSvc:
-     image: 'cmyanko/nexus-ssc-integration:20.1.0.22'
-     build: ./intSvc
-     depends_on:
-       - ssc
-       - iq-server
-     ports:
-       - '8182:8182'
-     volumes:
-       - '~/.demo-pv/intSvcWorkFolder:/home/nexus/work:delegated'
+# ## Fortify on-premise integration
+#    #The Integration Service connects IQ to Fortify SSC
+#    intSvc:
+#      image: 'cmyanko/nexus-ssc-integration:20.1.0.22'
+#      build: ./intSvc
+#      depends_on:
+#        - ssc
+#        - iq-server
+#      ports:
+#        - '8182:8182'
+#      volumes:
+#        - '~/.demo-pv/intSvcWorkFolder:/home/nexus/work:delegated'
 
-  #  # The SSC container is a private container for Microfocus and Sonatype employees
-  #  # for use in Demo's and PoC's    
-   ssc:
-      image: 'fortifydocker/sscdemo:20.1.0'
-      ports:
-       - '8888:8080'
-      volumes:
-       - '~/.demo-pv/fortify:/fortify:delegated'
-      environment:
-       - SSC_MAX_MEM_MB=4096
+#   #  # The SSC container is a private container for Microfocus and Sonatype employees
+#   #  # for use in Demo's and PoC's    
+#    ssc:
+#       image: 'fortifydocker/sscdemo:20.1.0'
+#       ports:
+#        - '8888:8080'
+#       volumes:
+#        - '~/.demo-pv/fortify:/fortify:delegated'
+#       environment:
+#        - SSC_MAX_MEM_MB=4096
